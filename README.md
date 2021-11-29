@@ -26,8 +26,8 @@ The configuration is done in the source file:
 
 // Lifebar model (sprites/next21_efk/lifebar_numeric.spr for numeric)
 new const MODELS_LIFEBAR[2][] = {
-	"sprites/next21_efk/lifebar_numeric.spr", // for the terrorist team
-	"sprites/next21_efk/lifebar_numeric.spr" // for the counter-terrorist team
+	"sprites/next21_efk/lifebar_def.spr", // for the terrorist team
+	"sprites/next21_efk/lifebar_def.spr" // for the counter-terrorist team
 }
 ```
 

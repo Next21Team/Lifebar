@@ -26,8 +26,8 @@ AMX Mod X плагин для Counter-Strike.
 
 // Модель лайфбара (sprites/next21_efk/lifebar_numeric.spr для цифрового)
 new const MODELS_LIFEBAR[2][] = {
-	"sprites/next21_efk/lifebar_numeric.spr", // для команды террористов
-	"sprites/next21_efk/lifebar_numeric.spr" // для команды контр-террористов
+	"sprites/next21_efk/lifebar_def.spr", // для команды террористов
+	"sprites/next21_efk/lifebar_def.spr" // для команды контр-террористов
 }
 ```
 
