@@ -18,8 +18,8 @@ AMX Mod X плагин для Counter-Strike.
 Конфигурация производится в файле исходного кода:
 ```c
 // #define COLORED_LIFEBAR // Использовать цветной лайфбар (раскомментировать для поддержки цветов)
-#define COLOR_RED Float: { 255.0, 0.0, 0.0 } // Цвет лайфбара для команды террористов
-#define COLOR_BLUE Float: { 0.0, 0.0, 255.0 } // Цвет лайфбара для команды контр-террористов
+#define COLOR_RED Float:{ 255.0, 0.0, 0.0 } // Цвет лайфбара для команды террористов
+#define COLOR_BLUE Float:{ 0.0, 0.0, 255.0 } // Цвет лайфбара для команды контр-террористов
 #define LIFEBAR_RENDERMODE kRenderTransTexture
 #define LIFEBAR_RENDERAMT 255.0
 #define LIFEBAR_SCALE 0.2 // Размер лайфбара

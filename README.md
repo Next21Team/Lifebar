@@ -18,8 +18,8 @@ The plugin adds a health bar above the players.
 The configuration is done in the source file:
 ```c
 // #define COLORED_LIFEBAR // Use a colored lifebar (uncomment for color support)
-#define COLOR_RED Float: { 255.0, 0.0, 0.0 } // Lifebar color for the terrorist team
-#define COLOR_BLUE Float: { 0.0, 0.0, 255.0 } // Lifebar color for the counter-terrorist team
+#define COLOR_RED Float:{ 255.0, 0.0, 0.0 } // Lifebar color for the terrorist team
+#define COLOR_BLUE Float:{ 0.0, 0.0, 255.0 } // Lifebar color for the counter-terrorist team
 #define LIFEBAR_RENDERMODE kRenderTransTexture
 #define LIFEBAR_RENDERAMT 255.0
 #define LIFEBAR_SCALE 0.2 // Lifebar size

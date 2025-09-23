@@ -13,8 +13,8 @@
 // #define COLORED_LIFEBAR
 
 #if defined COLORED_LIFEBAR
-    #define COLOR_RED Float: { 255.0, 0.0, 0.0 }
-    #define COLOR_BLUE Float: { 0.0, 0.0, 255.0 }
+    #define COLOR_RED Float:{ 255.0, 0.0, 0.0 }
+    #define COLOR_BLUE Float:{ 0.0, 0.0, 255.0 }
     #define LIFEBAR_RENDERMODE kRenderTransTexture
     #define LIFEBAR_RENDERAMT 255.0
 #endif
@@ -36,8 +36,8 @@ enum
 }
 
 
-new g_iLifebar[33], g_isAlive[33], g_iTeam[33]
-new g_ptLifeBarKey, g_ptEnvSprite
+new g_iLifebar[33], bool:g_isAlive[33], g_iTeam[33]
+new g_ptEnvSprite
 new g_pCvars[CVAR_END], g_iCvars[CVAR_END]
 
 public plugin_precache()
@@ -50,15 +50,14 @@ public plugin_precache()
 public plugin_init()
 {
     register_plugin(PLUGIN, VERSION, AUTHOR)
-    
+
     RegisterHam(Ham_Spawn, "player", "FM_HamPlayerSpawn_Post", 1)
     RegisterHam(Ham_Killed, "player", "FM_PlayerKilled_Post", 1)
-    
+
     register_event("Health", "Event_ChangeHealth", "be")
     register_message(get_user_msgid("TeamInfo"), "Event_TeamInfo")
-    
+
     g_ptEnvSprite = engfunc(EngFunc_AllocString, "env_sprite")
-    g_ptLifeBarKey = engfunc(EngFunc_AllocString, "next21_lifebar")
 
     g_pCvars[CVAR_TEAM] = register_cvar("lifebar_team", "0")
     g_pCvars[CVAR_ALIVE] = register_cvar("lifebar_alive", "0")
@@ -77,7 +76,8 @@ public plugin_init()
 
 public client_putinserver(iPlayer)
 {
-    g_isAlive[iPlayer] = g_iTeam[iPlayer] = 0
+    g_isAlive[iPlayer] = false
+    g_iTeam[iPlayer] = 0
     g_iLifebar[iPlayer] = 0
 
     new iLifeBar = engfunc(EngFunc_CreateNamedEntity, g_ptEnvSprite)
@@ -88,7 +88,6 @@ public client_putinserver(iPlayer)
         set_pev(iLifeBar, pev_aiment, iPlayer)
         set_pev(iLifeBar, pev_scale, LIFEBAR_SCALE)
         set_pev(iLifeBar, pev_effects, EF_NODRAW)
-        set_pev(iLifeBar, pev_impulse, g_ptLifeBarKey)
 
         #if defined COLORED_LIFEBAR
             set_pev(iLifeBar, pev_rendermode, LIFEBAR_RENDERMODE)
@@ -102,9 +101,10 @@ public client_putinserver(iPlayer)
 }
 
 public client_disconnected(iPlayer)
-{   
-    g_isAlive[iPlayer] = g_iTeam[iPlayer] = 0
-    
+{
+    g_isAlive[iPlayer] = false
+    g_iTeam[iPlayer] = 0
+
     if (g_iLifebar[iPlayer])
     {
         set_pev(g_iLifebar[iPlayer], pev_flags, FL_KILLME)
@@ -115,10 +115,10 @@ public client_disconnected(iPlayer)
 public FM_HamPlayerSpawn_Post(iPlayer)
 {
     if (is_user_alive(iPlayer))
-    {   
-        g_isAlive[iPlayer] = 1
+    {
+        g_isAlive[iPlayer] = true
         g_iTeam[iPlayer] = get_pdata_int(iPlayer, 114)
-        
+
         new iLifeBar = g_iLifebar[iPlayer]
         if (iLifeBar)
         {
@@ -134,21 +134,26 @@ public FM_HamPlayerSpawn_Post(iPlayer)
 
 public FM_PlayerKilled_Post(iPlayer)
 {
-    g_isAlive[iPlayer] = 0
-    
+    g_isAlive[iPlayer] = false
+
     if (g_iLifebar[iPlayer])
         set_pev(g_iLifebar[iPlayer], pev_effects, EF_NODRAW)
 }
 
 public FM_AddToFullPack_Post(eState, e, iEnt, iHost)
-{   
-    if (!pev_valid(iEnt) || pev(iEnt, pev_impulse) != g_ptLifeBarKey)
+{
+    static iTarget, bool:isTeamHide, bool:isAliveHide
+
+    if (!pev_valid(iEnt))
         return
 
-    static iTarget, bool: isTeamHide, bool: isAliveHide
     iTarget = pev(iEnt, pev_aiment)
+
+    if (iTarget >= sizeof g_iLifebar || g_iLifebar[iTarget] != iEnt)
+        return
+
     isTeamHide = g_iCvars[CVAR_TEAM] - _:(g_iTeam[iTarget] == g_iTeam[iHost]) == 1
-    isAliveHide = g_iCvars[CVAR_ALIVE] - g_isAlive[iHost] == 1
+    isAliveHide = g_iCvars[CVAR_ALIVE] - _:g_isAlive[iHost] == 1
 
     if (iHost == iTarget || isTeamHide || isAliveHide)
         set_es(eState, ES_Effects, EF_NODRAW)
@@ -156,27 +161,27 @@ public FM_AddToFullPack_Post(eState, e, iEnt, iHost)
 
 public Event_ChangeHealth(iPlayer)
 {
-    static iHealth, iMaxHealth
-    
+    new iHealth, iMaxHealth
+
     if (g_iLifebar[iPlayer])
     {
         iMaxHealth = g_iCvars[CVAR_MAX_HEALTH]
         iHealth = get_user_health(iPlayer)
-        
+
         if (iHealth > iMaxHealth)
             iHealth = iMaxHealth
 
         set_pev(g_iLifebar[iPlayer], pev_frame, iHealth * 100 / iMaxHealth - 1.0)
-    }   
+    }
 }
 
 public Event_TeamInfo()
 {
     new iPlayer = get_msg_arg_int(1)
-    
+
     new szTeamName[2], iTeam
     get_msg_arg_string(2, szTeamName, 1)
-            
+
     switch (szTeamName[0])
     {
         case 'T': iTeam = 1
@@ -205,7 +210,7 @@ public Event_TeamInfo()
 #if AMXX_VERSION_NUM > 183
     public cvar_team_changed(pCvar, const szOldValue[], const szNewValue[])
         switch_ATFP(str_to_num(szNewValue) || g_iCvars[CVAR_ALIVE])
-    
+
     public cvar_alive_changed(pCvar, const szOldValue[], const szNewValue[])
         switch_ATFP(g_iCvars[CVAR_TEAM] || str_to_num(szNewValue))
 #else
