@@ -1,0 +1,37 @@
+name: Compile Plugin
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  workflow_dispatch:
+
+jobs:
+  compile:
+    name: Compile next21_lifebar.sma
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up AMX Mod X compiler
+        run: |
+          AMXX_VERSION="1.10.0"
+          wget -q "https://www.amxmodx.org/amxxdrop/${AMXX_VERSION}/amxmodx-${AMXX_VERSION}-base-linux.tar.gz" -O amxmodx-base.tar.gz
+          tar -xzf amxmodx-base.tar.gz
+          chmod +x addons/amxmodx/scripting/amxxpc
+
+      - name: Compile plugin
+        run: |
+          addons/amxmodx/scripting/amxxpc addons/amxmodx/scripting/next21_lifebar.sma \
+            -o addons/amxmodx/plugins/next21_lifebar.amxx \
+            -i addons/amxmodx/scripting/include
+
+      - name: Upload compiled plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: next21_lifebar
+          path: addons/amxmodx/plugins/next21_lifebar.amxx
+          if-no-files-found: error
