@@ -86,6 +86,7 @@ public client_putinserver(iPlayer)
     {
         set_pev(iLifeBar, pev_movetype, MOVETYPE_FOLLOW)
         set_pev(iLifeBar, pev_aiment, iPlayer)
+        set_pev(iLifeBar, pev_origin, Float:{0.0, 0.0, 45.0})
         set_pev(iLifeBar, pev_scale, LIFEBAR_SCALE)
         set_pev(iLifeBar, pev_effects, EF_NODRAW)
 
